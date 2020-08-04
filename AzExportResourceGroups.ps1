@@ -1,6 +1,6 @@
 ﻿# David Roitman
 # Export Resource Group script v1.1 - 21/6/2020
-# Written/Tested in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM
 
 #connect-azaccount
 

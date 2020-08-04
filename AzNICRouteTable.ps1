@@ -4,7 +4,7 @@
 # v1.2 - 26/7/2020 Added enumeration of Effective Network Security Groups
 # v1.3 - 2/8/2020 Altered output to Format-Table (to make file comparison function more accurate) with custom processing for single destination routes vs multi prefix destination routes and updated Effective NSG capture process.
 # This is designed to be run within a manually selected subscription of your choice
-# Written/Tested in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
 # Utilised one other module which contains one function
 
 #connect-azaccount

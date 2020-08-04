@@ -3,7 +3,7 @@
 # v1.2 - 1/7/2020 - Augmented function to check file size of output and if file is empty then delete it
 # v2.0 - 11/7/2020 - Added function to get specifics details of Express Route Gateways & Gateway Subnets (switched to Az Module 4.1.0)
 # v2.1 - 1/8/202 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
-# Written in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
 # DOES NOT contain any error control for failure to create directories/files.

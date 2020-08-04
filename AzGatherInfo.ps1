@@ -1,7 +1,7 @@
 ﻿# David Roitman
 # Gather Azure information via Az Powershell "Get-Az" commands v2.0 - 27/6/2020
 # v2.1 - 12/7/2020 - Added call to new function to enumerate Virtual Network Gateways and Express Route Circuits and gather info, comment out if undesired.
-# Written in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM
 # Utilised two other modules which each contain one function
 
 #connect-azaccount

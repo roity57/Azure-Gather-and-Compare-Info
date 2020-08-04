@@ -2,7 +2,7 @@
 # Az-ExportRGFuncsAll.ps1
 # v1.1 - 21/6/2020
 # v1.2 - 2/8/2020 Updated enumeration of user documents (tested in Az 4.4.0)
-# Written in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
 # Utilises Get-AzResourceGroup & Get-AzContext functions to determine file output path and name
 # Utilises Export-AzResourceGroup 
 # DOES NOT contain any error control for file system issues (failure to create directories/files).
@@ -26,7 +26,7 @@ function Export-AzResourceGroupsAll
   $aztid=$aztn.Tenant.Id
 
   #Get user profile details to piece together profile path
-  $uprof= [environment]::getfolderpath("mydocuments")
+  $uprof=[environment]::getfolderpath("mydocuments")
   
   #Define final output folder
   $outfilestore=$uprof+"\"+$aztid+"\"+$Subscription+"\"
@@ -56,7 +56,7 @@ function Export-AzResourceGroupsAll
     Export-AzResourceGroup -ResourceGroupName $rg.ResourceGroupName -Path $tfileo
     
     #Specify the file location & pattern for the comparison function to run against the latest gathered information
-    $docdir=$uprof.Value+"\Documents\"+$aztid+"\"+$azcontextname+"\"
+    $docdir=$uprof+"\"+$aztid+"\"+$azcontextname+"\"
     $cfile="*"+$cfile
     Comp-AzData -Pattern $cfile -DocDir $docdir
    

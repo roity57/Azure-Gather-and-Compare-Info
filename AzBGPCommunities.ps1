@@ -4,7 +4,7 @@
 # v1.1 - 31/7/2020 Updated method of enumerating and using Windows Documents folder
 # You can designate the BGP Communities desired by the Name as MS list it in the "name" field, or enumerate all of them - detailed in the script.
 # You can just extract the CIDR prefixes, or the fuller data including prefxies - detailed in the script.
-# Written in a PowerShell 5.1.19041.1 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
 # Creates folder for data capture and then a sub-folder per Azure BGP Community
 # Calls File comparison function to process output files inside each BGP Community directory.
 # DOES NOT contain any error control for failure to create directories/files.
@@ -57,9 +57,14 @@ foreach ($bgpc in $bgpclist) {
   #############################################################################################################################################
   # If you want to extract just the CIDR notation list of IP address ranges then use the first Get- call, otherwise use the second            #
   #############################################################################################################################################
-    
+  
+  Write-Host "Fetching : " -NoNewline -ForegroundColor White
+  write-host  $bgpc -ForegroundColor Cyan 
+  write-host "Saving to: " -NoNewline
+  write-host $tfileo -ForegroundColor Cyan
+
   #Get only CIDR notation list of IP address ranges relevant to the BGP community
-  Get-AzBgpServiceCommunity | Where-Object Name -eq $bgpc | Select-Object -ExpandProperty BgpCommunities | Select-Object CommunityPrefixes | Select -ExpandProperty CommunityPrefixes | out-file $tfileo
+  Get-AzBgpServiceCommunity | Where-Object Name -eq $bgpc | Select-Object -ExpandProperty BgpCommunities | Select-Object CommunityPrefixes | Select-Object -ExpandProperty CommunityPrefixes | out-file $tfileo
   
   #Get the full details from including Service Supported Region, Full Community Name & Community BGP Value number.
   #Get-AzBgpServiceCommunity | Where-Object Name -eq $bgpc | out-file $tfileo
