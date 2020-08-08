@@ -2,6 +2,7 @@
 # AzRouteTableUpdate.ps1
 # Bulk create UDR for CIDR network prefixes destined for Next Hop Type Internet.  This script creates routes, it DOES NOT create the route table.
 # v1.0 - 6/8/2020 Take a list of CIDR network prefixes and update Azure Route Table with new UDR for each Prefix 
+# v1.1 - 8/8/2020 Amended flag check mechanism for execution of Set-AzRouteTable 
 # 
 # Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
 # DOES NOT contain any error control for failure to create directories/files.
@@ -39,6 +40,7 @@ if ($bgpc.length -gt 0)
 $rtable=Get-AzRouteTable -Name $routetable 
 # Extract the destination route prefixes from the route table into an array
 $rtablepfx=$rtable.Routes.AddressPrefix
+$rtflagu=$false
 
 write-host "Testing: " $rtablepfx.Count "route table entries against "$cidrlist.count" Prefixes"
 
@@ -67,10 +69,11 @@ foreach ($cidr in $cidrlist) {
       write-host "Processing Route:" $cidr.Padright(18,' ') "Adding Route Name:" $routename.Padright(26,' ') "Address Prefix :" $cidr
       #Generate a new Route Table entry with the new Prefix added for Next Hop Type Internet (customise as desired)
       $rtable | Add-AzRouteConfig -Name $routename -AddressPrefix $cidr -NextHopType Internet | out-null 
+      $rtflagu=$true
       }
     }
     #If new route entries have been compiled, once the new list is ready commit the updated list into Azure.  Output can be supressed if desired
-    if ($rtflag -eq $false)
+    if ($rtflagu -eq $true)
       {
       $rtable | Set-AzRouteTable | Out-Null
       }
