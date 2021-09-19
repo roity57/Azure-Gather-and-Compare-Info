@@ -2,8 +2,9 @@
 # v1.1 - 21/6/2020
 # v1.2 - 1/7/2020 - Augmented function to check file size of output and if file is empty then delete it
 # v2.0 - 11/7/2020 - Added function to get specifics details of Express Route Gateways & Gateway Subnets (switched to Az Module 4.1.0)
-# v2.1 - 1/8/202 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# v2.1 - 1/8/2020 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
+# v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
 # DOES NOT contain any error control for failure to create directories/files.
@@ -193,5 +194,67 @@ function Get-AzNetGates
     Write-Host "Merged Output to     :" $mfileo
     
     }
+
+  }
+
+
+  function Get-AzDNSDetails
+{
+
+  param (
+    [string]$Subscription
+    )
+  
+  #Put together Date & time for filename format  
+  $date=get-date -Format "ddMMyyyy"
+  $time=get-date -Format "HHmm"
+  $cdate=$date+"-"+$time
+  
+  Select-AzSubscription -Subscription $Subscription | Out-Null
+  $aztn=Get-AzContext | Select-Object Tenant
+  $aztid=$aztn.Tenant.Id
+
+  #Get user profile details to piece together profile path
+  $uprof=Get-Item -Path Env:USERPROFILE
+  
+  #Define final output folder
+  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\DNSZones\"
+  
+  [array]$dnsza=Get-AzDnsZone 
+ 
+  #Check for output directory existance and if not present, create it.
+  If($dnsza.Length -gt 0)
+    {
+    If(!(test-path $outfilestore))
+      {
+        New-Item -ItemType Directory -Force -Path $outfilestore | Out-Null
+      }
+    }
+  else
+    {
+      Write-Host "Subscription:" $Subscription "did not contain any DNS Zones"
+    }
+     
+  foreach ($dnsz in $dnsza) {
+    $tfile=$cdate+"-"+$dnsz.Name+".txt"
+    $tfileo=$outfilestore+$tfile
+    Write-Host "Fetch DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
+    $dnsrecs = $dnsz | Get-AzDnsRecordSet
+    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
+    $dnsrecs | Out-File $tfileo -Width 600
+        
+    $tfile=$cdate+"-"+$dnsz.Name+"-table.txt"
+    $tfileo=$outfilestore+$tfile
+    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
+    $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfileo -Width 600
+  
+    
+    #Test to see if any data was written and if not, delete the file that had been created.  If the file was created, go ahead and strip content from file as detailed below.
+    If ((Get-Item $tfileo).Length -eq 0) 
+      {
+      Write-Host "Execution:" $GetAz "produced no output so" $tfileo "deleted."
+      Remove-Item -Path $tfileo
+      }
+   }
 
   }

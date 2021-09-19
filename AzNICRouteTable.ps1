@@ -4,7 +4,7 @@
 # v1.2 - 26/7/2020 Added enumeration of Effective Network Security Groups
 # v1.3 - 2/8/2020 Altered output to Format-Table (to make file comparison function more accurate) with custom processing for single destination routes vs multi prefix destination routes and updated Effective NSG capture process.
 # This is designed to be run within a manually selected subscription of your choice
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilised one other module which contains one function
 
 #connect-azaccount
@@ -123,6 +123,7 @@ foreach ($azvmnic in $aznics) {
     #Enumerate Effective Network Security Groups.  This will attempt to gather effective rules even if there is no NSG directly attached as there could be inherited NSGs from the subnet.
     write-host "Fetching NSG for   : " $azvmnic.Name "that is attached to" $vm.VMName "on subnet" $vm.VMSubnet "if NSG associated"
     $ensg=Get-AzEffectiveNetworkSecurityGroup -NetworkInterfaceName $azvmnic.Name -ResourceGroupName $azvmnic.ResourceGroupName 
+    write-host $error[2]  
     if ($ensg.length -gt 0) {
       write-host "Output saving to   : " $nsgtfileo
       write $nsgfheader | Out-File -FilePath $nsgtfileo 

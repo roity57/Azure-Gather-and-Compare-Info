@@ -1,14 +1,15 @@
 ﻿# David Roitman
 # Gather Azure information via Az Powershell "Get-Az" commands v2.0 - 27/6/2020
 # v2.1 - 12/7/2020 - Added call to new function to enumerate Virtual Network Gateways and Express Route Circuits and gather info, comment out if undesired.
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM
+# v2.2 - 19/9/2021 - Added call to new function to fetch DNS zones and record details, comment out if undesired. Also added Application Gateway Get command to array.
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilised two other modules which each contain one function
 
 #connect-azaccount
 
 
 #Define the commands to run
-[array]$azget="Get-AzResource","Get-AzNetworkSecurityGroup","Get-AzVirtualNetwork","Get-AzRouteTable","Get-AzPublicIpAddress","Get-AzNetworkInterface","Get-AzLoadBalancer","Get-AzNetworkWatcher","Get-AzRouteFilter"
+[array]$azget="Get-AzResource","Get-AzNetworkSecurityGroup","Get-AzVirtualNetwork","Get-AzRouteTable","Get-AzPublicIpAddress","Get-AzNetworkInterface","Get-AzLoadBalancer","Get-AzNetworkWatcher","Get-AzRouteFilter","Get-AzApplicationGateway"
 
 #Enumerate the Azure Contexts available to loop through
 [array]$aztenant=Get-AzContext -ListAvailable 
@@ -45,6 +46,7 @@ foreach ($azt in $aztenant) {
   
 
   Get-AzNetGates $aztenantname
+  Get-AzDNSDetails $aztenantname
   
 }
 

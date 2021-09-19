@@ -4,7 +4,7 @@
 # v2.2 - 01/8/2020 Updated to cater for both either .txt or .json files being compared with regards to creating a .log file output
 # v3.0 - 04/8/2020 Added function to compare latest files to ALL previous files and produce basic diff file
 # v3.1 - 07/8/2020 Amended output commentary to cover for files that only have subtle differences, amended to prevent null variable error if source file blank
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Function Comp-AzData
 # Compare two files matching a certain pattern for the two newest files based on file system date/time stamp.
 # The function takes in two parameters, being the partially prepared file pattern source and the folder location of the files to be compared

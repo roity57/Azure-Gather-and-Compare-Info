@@ -1,6 +1,9 @@
 ﻿# David Roitman
 # Export Resource Group script v1.1 - 21/6/2020
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
+# This Export function will raise warnings about limitations in the content of the Resource template that it exports and exporting resources have some maximum limitations
+# Azure has limits for Resource Group exports – https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#resource-group-limits. 
+# The Export Resource Group function will fail on a resource group with more than 200 resources
 
 #connect-azaccount
 

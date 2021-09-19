@@ -4,7 +4,7 @@
 # v1.1 - 31/7/2020 Updated method of enumerating and using Windows Documents folder
 # You can designate the BGP Communities desired by the Name as MS list it in the "name" field, or enumerate all of them - detailed in the script.
 # You can just extract the CIDR prefixes, or the fuller data including prefxies - detailed in the script.
-# Written/Tested in a PowerShell 7.0.3 environment with Az Module 4.4.0 on a Windows 10 VM using Australian Date/time format
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Creates folder for data capture and then a sub-folder per Azure BGP Community
 # Calls File comparison function to process output files inside each BGP Community directory.
 # DOES NOT contain any error control for failure to create directories/files.
@@ -21,10 +21,10 @@ $uprof= [environment]::getfolderpath("mydocuments")
 #############################################################################################################################################
    
 #Specify the Community Names desired as they would appear in the "Name" object.
-[array]$bgpclist="AzureAustraliaSoutheast","AzureAustraliaEast","AzureCosmosDBUAENorth"
+#[array]$bgpclist="AzureAustraliaSoutheast","AzureAustraliaEast","AzureCosmosDBUAENorth"
 
 #Enumerate ALL Microsoft BGP Communities
-#[array]$bgpclist=Get-AzBgpServiceCommunity | Select-Object -ExpandProperty Name
+[array]$bgpclist=Get-AzBgpServiceCommunity | Select-Object -ExpandProperty Name
 
 #Define BGP root output folder
 $outfileroot=$uprof+"\AzBGPCommunity"
