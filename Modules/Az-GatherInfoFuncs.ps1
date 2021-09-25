@@ -4,6 +4,7 @@
 # v2.0 - 11/7/2020 - Added function to get specifics details of Express Route Gateways & Gateway Subnets (switched to Az Module 4.1.0)
 # v2.1 - 1/8/2020 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
 # v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone
+# v2.3 - 25/9/2021 - Removed redundant file cleanup code in DNS records function
 # Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
@@ -244,17 +245,12 @@ function Get-AzNetGates
     $dnsrecs | Out-File $tfileo -Width 600
         
     $tfile=$cdate+"-"+$dnsz.Name+"-table.txt"
-    $tfileo=$outfilestore+$tfile
-    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
-    $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfileo -Width 600
+    $tfilet=$outfilestore+$tfile
+    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfilet
+    $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfilet -Width 600
   
     
-    #Test to see if any data was written and if not, delete the file that had been created.  If the file was created, go ahead and strip content from file as detailed below.
-    If ((Get-Item $tfileo).Length -eq 0) 
-      {
-      Write-Host "Execution:" $GetAz "produced no output so" $tfileo "deleted."
-      Remove-Item -Path $tfileo
-      }
+    
    }
 
   }
