@@ -4,7 +4,7 @@
 # v2.0 - 11/7/2020 - Added function to get specifics details of Express Route Gateways & Gateway Subnets (switched to Az Module 4.1.0)
 # v2.1 - 1/8/2020 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
 # v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone
-# v2.3 - 25/9/2021 - Removed redundant file cleanup code in DNS records function
+# v2.3 - 25/9/2021 - Added processing of Private DNS Zones & Removed redundant file cleanup code in DNS records function
 # Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
@@ -218,10 +218,13 @@ function Get-AzNetGates
   #Get user profile details to piece together profile path
   $uprof=Get-Item -Path Env:USERPROFILE
   
-  #Define final output folder
+  #Define final output folders
   $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\DNSZones\"
-  
+  $outfilestorep=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\PrivateDNSZones\"
+
+  #Fetch all DNS Zones
   [array]$dnsza=Get-AzDnsZone 
+  [array]$dnszpa=Get-AzPrivateDnsZone
  
   #Check for output directory existance and if not present, create it.
   If($dnsza.Length -gt 0)
@@ -233,7 +236,20 @@ function Get-AzNetGates
     }
   else
     {
-      Write-Host "Subscription:" $Subscription "did not contain any DNS Zones"
+      Write-Host "Subscription:" $Subscription "did not contain any Public DNS Zones"
+    }
+
+  #Check for output directory existance and if not present, create it.
+  If($dnszpa.Length -gt 0)
+    {
+    If(!(test-path $outfilestorep))
+      {
+        New-Item -ItemType Directory -Force -Path $outfilestorep | Out-Null
+      }
+    }
+  else
+    {
+      Write-Host "Subscription:" $Subscription "did not contain any Private DNS Zones"
     }
      
   foreach ($dnsz in $dnsza) {
@@ -248,9 +264,20 @@ function Get-AzNetGates
     $tfilet=$outfilestore+$tfile
     Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfilet
     $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfilet -Width 600
-  
-    
-    
+   }
+
+   foreach ($dnsz in $dnszpa) {
+    $tfile=$cdate+"-"+$dnsz.Name+".txt"
+    $tfileo=$outfilestorep+$tfile
+    Write-Host "Fetch DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
+    $dnsrecs = $dnsz | Get-AzPrivateDnsRecordSet
+    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfileo
+    $dnsrecs | Out-File $tfileo -Width 600
+        
+    $tfile=$cdate+"-"+$dnsz.Name+"-table.txt"
+    $tfilet=$outfilestorep+$tfile
+    Write-Host "Fetched DNS Records from:" $dnsz.Name "within subscription" $Subscription "writing to" $tfilet
+    $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfilet -Width 600
    }
 
   }
