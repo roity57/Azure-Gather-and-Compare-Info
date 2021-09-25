@@ -219,7 +219,7 @@ function Get-AzNetGates
   $uprof=Get-Item -Path Env:USERPROFILE
   
   #Define final output folders
-  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\DNSZones\"
+  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\PublicDNSZones\"
   $outfilestorep=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\PrivateDNSZones\"
 
   #Fetch all DNS Zones
