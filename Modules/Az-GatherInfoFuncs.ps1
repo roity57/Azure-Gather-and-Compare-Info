@@ -3,8 +3,9 @@
 # v1.2 - 1/7/2020 - Augmented function to check file size of output and if file is empty then delete it
 # v2.0 - 11/7/2020 - Added function to get specifics details of Express Route Gateways & Gateway Subnets (switched to Az Module 4.1.0)
 # v2.1 - 1/8/2020 - Updated method of enumerating and using Windows Documents folder (switched to Az Module 4.4.0)
-# v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone
+# v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone (switched to Az Module )
 # v2.3 - 25/9/2021 - Added processing of Private DNS Zones & Removed redundant file cleanup code in DNS records function
+# v2.4 - 2/10/2021 - Amended enumeration of profile folder for ExpressRoute and DNS Zones to match v2.1 update above.
 # Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
@@ -79,10 +80,10 @@ function Get-AzNetGates
   $aztid=$aztn.Tenant.Id
 
   #Get user profile details to piece together profile path
-  $uprof=Get-Item -Path Env:USERPROFILE
+  $uprof= [environment]::getfolderpath("mydocuments")
   
   #Define final output folder
-  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\VirtualNetworkGateway\"
+  $outfilestore=$uprof+"\"+$aztid+"\"+$Subscription+"\VirtualNetworkGateway\"
   
   [array]$vnetgwa=Get-AzResource | where ResourceType -Like "*virtualNetworkGateways" | Select-Object Name, ResourceGroupName
   [array]$netera=Get-AzResource | where ResourceType -Like "*expressRouteCircuits" | Select-Object Name, ResourceGroupName
@@ -216,11 +217,11 @@ function Get-AzNetGates
   $aztid=$aztn.Tenant.Id
 
   #Get user profile details to piece together profile path
-  $uprof=Get-Item -Path Env:USERPROFILE
-  
+  $uprof= [environment]::getfolderpath("mydocuments")
+    
   #Define final output folders
-  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\PublicDNSZones\"
-  $outfilestorep=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\PrivateDNSZones\"
+  $outfilestore=$uprof+"\"+$aztid+"\"+$Subscription+"\PublicDNSZones\"
+  $outfilestorep=$uprof+"\"+$aztid+"\"+$Subscription+"\PrivateDNSZones\"
 
   #Fetch all DNS Zones
   [array]$dnsza=Get-AzDnsZone 
