@@ -6,6 +6,7 @@
 # v2.2 - 19/9/2021 - Added Function to extract Azure DNS records for each zone (switched to Az Module )
 # v2.3 - 25/9/2021 - Added processing of Private DNS Zones & Removed redundant file cleanup code in DNS records function
 # v2.4 - 2/10/2021 - Amended enumeration of profile folder for ExpressRoute and DNS Zones to match v2.1 update above.
+# v2.4 - 3/10/2021 - Correct errors for profile folder check and creation for ExpressRoute.
 # Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
@@ -89,7 +90,7 @@ function Get-AzNetGates
   [array]$netera=Get-AzResource | where ResourceType -Like "*expressRouteCircuits" | Select-Object Name, ResourceGroupName
 
   #Check for output directory existance and if not present, create it.
-  If($vnetgw.Length -gt 0)
+  If($vnetgwa.Length -gt 0)
     {
     If(!(test-path $outfilestore))
       {
@@ -131,7 +132,7 @@ function Get-AzNetGates
     }
   
   #Define final output folder
-  $outfilestore=$uprof.Value+"\Documents\"+$aztid+"\"+$Subscription+"\Express Route\"
+  $outfilestore=$uprof+"\"+$aztid+"\"+$Subscription+"\Express Route\"
   
   #Check for output directory existance and if not present, create it.
   If($netera.Length -gt 0)
