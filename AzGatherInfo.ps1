@@ -3,7 +3,8 @@
 # v2.1 - 12/7/2020 - Added call to new function to enumerate Virtual Network Gateways and Express Route Circuits and gather info, comment out if undesired.
 # v2.2 - 19/9/2021 - Added call to new function to fetch DNS zones and record details, comment out if undesired. Also added Application Gateway Get command to array.
 # v2.3 - 2/10/2021 - Added Get-AzApiManagement to the array
-# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
+# v2.4 - 2/7/2022 - Added call to new function to report specific Virtual Network and Subnet details
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x, 6.x & 8.0.0 on a Windows VM - NOT Regression tested against all available versions.
 # Utilised two other modules which each contain one function
 
 #connect-azaccount
@@ -50,6 +51,7 @@ foreach ($azt in $aztenant) {
 
   Get-AzNetGates $aztenantname
   Get-AzDNSDetails $aztenantname
+  Get-AzVirtNetDets $aztenantname
   
 }
 

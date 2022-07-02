@@ -7,10 +7,13 @@
 # v2.3 - 25/9/2021 - Added processing of Private DNS Zones & Removed redundant file cleanup code in DNS records function
 # v2.4 - 2/10/2021 - Amended enumeration of profile folder for ExpressRoute and DNS Zones to match v2.1 update above.
 # v2.4 - 3/10/2021 - Correct errors for profile folder check and creation for ExpressRoute.
-# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x & 6.x on a Windows VM
+# v2.5 - 2/7/2022 - Added Function to extract Virtual Network with Subnet details (PS 7.2 & Az Module 6.x)
+# Tested in PowerShells 5.x & 7.x environments with Az Module 4.x, 6.x & 8.0.0 on a Windows VM - NOT Regression tested against all available versions.
 # Utilises Supplied Parameter to determine file output path and name
 # Utilises Invoke-Expression
 # DOES NOT contain any error control for failure to create directories/files.
+# Reference: https://stackoverflow.com/questions/67179808/trying-to-list-azure-virtual-network-and-export-to-csv-using-powershell
+# https://dev.to/roberthstrand/list-all-vnet-and-subnets-across-multiple-subscriptions-4028
 
 function Get-AzNetDetails
 {
@@ -282,4 +285,55 @@ function Get-AzNetGates
     $dnsrecs | Select-Object Name,Ttl,RecordType,Records,Metadata,ProvisioningState | Format-Table | Out-File $tfilet -Width 600
    }
 
+  }
+
+   function Get-AzVirtNetDets
+   {
+   
+     param (
+       [string]$Subscription
+       )
+     
+     #Put together Date & time for filename format  
+     $date=get-date -Format "ddMMyyyy"
+     $time=get-date -Format "HHmm"
+     $cdate=$date+"-"+$time
+     
+     Select-AzSubscription -Subscription $Subscription | Out-Null
+     $aztn=Get-AzContext | Select-Object Tenant
+     $aztid=$aztn.Tenant.Id
+   
+     #Get user profile details to piece together profile path
+     $uprof= [environment]::getfolderpath("mydocuments")
+       
+     #Define final output folders
+     $outfilestore=$uprof+"\"+$aztid+"\"+$Subscription+"\VNETDetails\"
+
+     #Fetch all Virtual Networks
+     [array]$vnets=Get-AzVirtualNetwork | Select Name, @{label='AddressSpace'; expression={$_.AddressSpace.AddressPrefixes}}, Subnets
+         
+     #Check for output directory existance and if not present, create it.
+     If($vnets.Length -gt 0)
+       {
+       If(!(test-path $outfilestore))
+         {
+           New-Item -ItemType Directory -Force -Path $outfilestore | Out-Null
+         }
+       }
+     else
+       {
+         Write-Host "Subscription:" $Subscription "did not contain any Virtual Networks"
+       }
+      foreach ($vnet in $vnets) {
+        $tfile=$cdate+"-VNET-"+$vnet.Name+".txt"
+        $tfileo=$outfilestore+$tfile
+        Write-Host "Fetch Virtual Network Details from:" $vnet.Name "within subscription" $Subscription "writing to" $tfileo
+        #$vnet.Name+" "+$vnet.AddressSpace
+        $vnet.Subnets | select Name, AddressPrefix, @{Name="NetworkSecurityGroup";Expression = {$_.NetworkSecurityGroup.Id.tostring().substring($_.NetworkSecurityGroup.Id.tostring().lastindexof('/')+1)}}, @{Name="RouteTable";Expression = {$_.RouteTable.Id.tostring().substring($_.RouteTable.Id.tostring().lastindexof('/')+1)}}, @{Name="BGP Disabled";Expression = {$_.RouteTable.DisableBgpRoutePropagation.tostring().substring($_.RouteTable.DisableBgpRoutePropagation.tostring().lastindexof('/')+1)}} | ft
+        $vnet.Subnets | select Name, AddressPrefix, @{Name="NetworkSecurityGroup";Expression = {$_.NetworkSecurityGroup.Id.tostring().substring($_.NetworkSecurityGroup.Id.tostring().lastindexof('/')+1)}}, @{Name="RouteTable";Expression = {$_.RouteTable.Id.tostring().substring($_.RouteTable.Id.tostring().lastindexof('/')+1)}}, @{Name="BGP Disabled";Expression = {$_.RouteTable.DisableBgpRoutePropagation.tostring().substring($_.RouteTable.DisableBgpRoutePropagation.tostring().lastindexof('/')+1)}} | ft | Out-File $tfileo -Width 600
+        $cfile="*-VNET-"+$vnet.Name+".txt"
+        Comp-AzData -Pattern $cfile -DocDir $outfilestore
+        
+      }
+      
   }
